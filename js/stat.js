@@ -1,51 +1,42 @@
 'use strict';
 
 window.renderStatistics = function (ctx, names, times) {
-  var boardStyle = {
-    color: 'rgba(255, 255, 255, 1)',
-    shadowColor: 'rgba(0, 0, 0, 0.7)',
-  };
 
-  var taglineStatictics = {
-    tagline: 'УРА ВЫ ПОБЕДИЛИ!',
-    color: '#e7e27b',
-    outlineColor: '#bf9c0d',
-    font: '20px PT Mono',
-  };
-
-  var textStatistics = {
-    text: 'Список результатов:',
-    color: '#bf9c0d',
-    font: '18px PT Mono'
-  };
-
-  var histogramOptions = {
-    indent: 90,
-    lineHeight: 15
-  };
-
-  // Отрисовка доски со статискикой
-  var drawBoardStats = function (initialX, initialY, width, height) {
-    ctx.fillStyle = boardStyle.shadowColor;
-    ctx.fillRect(initialX + 10, initialY + 10, width, height);
-    ctx.fillStyle = boardStyle.color;
+  // Отрисовка прямоугольника
+  var drawRectangle = function (initialX, initialY, width, height) {
     ctx.fillRect(initialX, initialY, width, height);
   };
 
+  // Запись текста
+  var writeText = function (text, initialX, initialY, font) {
+    ctx.font = font;
+    if (!font) {
+      (ctx.strokeText(text, initialX, initialY));
+    } else {
+      (ctx.fillText(text, initialX, initialY));
+    }
+  };
+
+  // Отрисовка доски со статискикой
+  var drawBoardStats = function (shadowColor, rectColor) {
+    ctx.fillStyle = shadowColor;
+    drawRectangle(150, 30, 420, 270);
+    ctx.fillStyle = rectColor;
+    drawRectangle(140, 20, 420, 270);
+  };
+
   // Отрисовка слогана
-  var drawBoardTagline = function (initialX, initialY) {
-    ctx.fillStyle = taglineStatictics.color;
-    ctx.strokeStyle = taglineStatictics.outlineColor;
-    ctx.font = taglineStatictics.font;
-    ctx.fillText(taglineStatictics.tagline, initialX, initialY);
-    ctx.strokeText(taglineStatictics.tagline, initialX - 3, initialY - 3);
+  var drawBoardTagline = function (color, outlineColor) {
+    ctx.fillStyle = color;
+    ctx.strokeStyle = outlineColor;
+    writeText('УРА ВЫ ПОБЕДИЛИ!', 233, 43, '20px PT Mono');
+    writeText('УРА ВЫ ПОБЕДИЛИ!', 230, 40);
   };
 
   // Отрисовка текста
-  var drawBoardText = function (initialX, initialY) {
-    ctx.fillStyle = textStatistics.color;
-    ctx.font = textStatistics.font;
-    ctx.fillText(textStatistics.text, initialX, initialY);
+  var drawBoardText = function (color) {
+    ctx.fillStyle = color;
+    writeText('Список результатов:', 150, 65, '18px PT Mono');
   };
 
   // Сортировка по увеличению времени прохождения уровня
@@ -69,31 +60,31 @@ window.renderStatistics = function (ctx, names, times) {
     }
   };
 
-  // Получение случейной прозрачности
-  var getRandomOpacity = function () {
-    return Math.random() * (1 - 0.5) + 0.5;
+  // Получение случайной прозрачности
+  var getRandomOpacity = function (max, min) {
+    return Math.random() * (max - min) + min;
   };
 
   // Отрисовка гистограмм
-  var drawHistogram = function (initialX, initialY, width, height) {
+  var drawHistogram = function (height, indent, lineHeight) {
 
     var step = height / (times[times.length - 1] - 0);
 
     for (var i = 0; i < times.length; i++) {
-      ctx.fillStyle = (names[i] === 'Вы') ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 67, 122, ' + getRandomOpacity() + ')';
-      ctx.fillRect(initialX + histogramOptions.indent * i, initialY, width, times[i] * (-step));
-      ctx.fillText(Math.round(times[i]) + 'мс', initialX + histogramOptions.indent * i, initialY + (-histogramOptions.lineHeight) + times[i] * (-step));
-      ctx.fillText(names[i], initialX + histogramOptions.indent * i, initialY + histogramOptions.lineHeight);
+      ctx.fillStyle = (names[i] === 'Вы') ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 67, 122, ' + getRandomOpacity(1, 0.5) + ')';
+      drawRectangle(170 + indent * i, 260, 40, times[i] * (-step));
+      writeText(Math.round(times[i]) + 'мс', 170 + indent * i, 260 + (-lineHeight) + times[i] * (-step), '18px PT Mono');
+      writeText(names[i], 170 + indent * i, 260 + lineHeight, '18px PT Mono');
     }
   };
 
-  drawBoardStats(140, 20, 420, 270);
+  drawBoardStats('rgba(0, 0, 0, 0.7)', 'rgba(255, 255, 255, 1)');
 
-  drawBoardTagline(233, 43);
+  drawBoardTagline('#e7e27b', '#bf9c0d');
 
-  drawBoardText(150, 65);
+  drawBoardText('#bf9c0d');
 
   sortTimes(times[0], names[0]);
 
-  drawHistogram(170, 260, 40, 150);
+  drawHistogram(150, 90, 15);
 };
