@@ -8,53 +8,53 @@ var WIZARD_OPTIONS = {
   eyesColors: ['black', 'red', 'blue', 'yellow', 'green']
 };
 
-var heroField = document.querySelector('.setup');
-heroField.classList.remove('hidden');
-heroField.querySelector('.setup-similar').classList.remove('hidden');
+// Показывает поле с персонажем
+var removeClass = function (className) {
+  var heroField = document.querySelector('.setup');
+  heroField.classList.remove(className);
+  heroField.querySelector('.setup-similar').classList.remove(className);
 
-var similarListHero = document.querySelector('.setup-similar-list');
-
-var similarWizardTemplate = document.querySelector('#similar-wizard-template').content.querySelector('.setup-similar-item');
-
-var fragment = document.createDocumentFragment();
+  return heroField;
+};
 
 // Получение случайного значения
 var getRandomValue = function (min, max) {
   return Math.round(Math.random() * (max - min) + min);
 };
 
+// Получение случайного имени
+var getRandomName = function (names, surnames) {
+  var fullName = [names[getRandomValue(0, names.length - 1)] + ' ' + surnames[getRandomValue(0, names.length - 1)], surnames[getRandomValue(0, names.length - 1)] + ' ' + names[getRandomValue(0, names.length - 1)]];
+
+  return fullName[getRandomValue(0, 1)];
+};
+
 // Получение случайного параметра
 var getRandomOption = function (options) {
-  if (!options) {
-    var fullName = WIZARD_OPTIONS.names[getRandomValue(0, WIZARD_OPTIONS.names.length - 1)] + ' ' + WIZARD_OPTIONS.surnames[getRandomValue(0, WIZARD_OPTIONS.names.length - 1)];
+  var randomColor = options[getRandomValue(0, WIZARD_OPTIONS.names.length - 1)];
 
-    return fullName;
-  } else {
-    var randomColor = options[getRandomValue(0, WIZARD_OPTIONS.names.length - 1)];
-
-    return randomColor;
-  }
+  return randomColor;
 };
 
 // Массив с похожими волшебниками
 var wizards = [
   {
-    fullName: getRandomOption(),
+    fullName: getRandomName(WIZARD_OPTIONS.names, WIZARD_OPTIONS.surnames),
     coatColors: getRandomOption(WIZARD_OPTIONS.coatColors),
     eyesColors: getRandomOption(WIZARD_OPTIONS.eyesColors)
   },
   {
-    fullName: getRandomOption(),
+    fullName: getRandomName(WIZARD_OPTIONS.names, WIZARD_OPTIONS.surnames),
     coatColors: getRandomOption(WIZARD_OPTIONS.coatColors),
     eyesColors: getRandomOption(WIZARD_OPTIONS.eyesColors)
   },
   {
-    fullName: getRandomOption(),
+    fullName: getRandomName(WIZARD_OPTIONS.names, WIZARD_OPTIONS.surnames),
     coatColors: getRandomOption(WIZARD_OPTIONS.coatColors),
     eyesColors: getRandomOption(WIZARD_OPTIONS.eyesColors)
   },
   {
-    fullName: getRandomOption(),
+    fullName: getRandomName(WIZARD_OPTIONS.names, WIZARD_OPTIONS.surnames),
     coatColors: getRandomOption(WIZARD_OPTIONS.coatColors),
     eyesColors: getRandomOption(WIZARD_OPTIONS.eyesColors)
   }
@@ -62,6 +62,7 @@ var wizards = [
 
 // Создание случайного волшебника
 var createWizard = function (wizard) {
+  var similarWizardTemplate = document.querySelector('#similar-wizard-template').content.querySelector('.setup-similar-item');
   var wizardElement = similarWizardTemplate.cloneNode(true);
 
   wizardElement.querySelector('.setup-similar-label').textContent = wizard.fullName;
@@ -73,10 +74,15 @@ var createWizard = function (wizard) {
 
 // Отрисовска фрагмента со случайными волшебниками
 var drawWizards = function () {
+  var fragment = document.createDocumentFragment();
+  var similarListHero = document.querySelector('.setup-similar-list');
+
   for (var i = 0; i < wizards.length; i++) {
     fragment.appendChild(createWizard(wizards[i]));
   }
   return similarListHero.appendChild(fragment);
 };
+
+removeClass('hidden');
 
 drawWizards();
